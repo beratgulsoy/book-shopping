@@ -13,6 +13,7 @@ exports.postAddProduct = (req, res, next) => {
     const imageUrl = req.body.imageUrl;
     const description = req.body.description;
     const price = req.body.price;
+    console.log(price, " prstAddProduct içindeki price değeri");
     const product = new Product(title, imageUrl, description, price);
     product.save();
     res.redirect('/');
@@ -51,6 +52,12 @@ exports.postEditProduct = (req, res, next) => {
         updatedPrice);
     updatedProduct.save();
     res.redirect('/');
+};
+
+exports.postDeleteProduct = (req, res, next) => {
+    const prodId = req.body.productId;
+    Product.delete(prodId);
+    res.redirect('/admin/products');
 };
 
 exports.getProducts =  (req, res, next) => {

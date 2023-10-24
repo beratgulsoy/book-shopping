@@ -15,13 +15,18 @@ exports.postAddProduct = (req, res, next) => {
     const price = req.body.price;
     console.log(price, " prstAddProduct içindeki price değeri");
     const product = new Product(title, imageUrl, description, price);
-    product.save();
-    res.redirect('/');
+    product
+    .save()
+    .then(() => {
+        res.redirect('/');
+    })
+    .catch(err => console.log(err));
+    
 };
 
 exports.getEditProduct = (req, res, next) => {
     const editMode = req.query.edit;
-    if(!editMode) {
+    if (!editMode) {
         return res.redirect('/');
     }
     const prodId = req.params.productId;
@@ -36,7 +41,7 @@ exports.getEditProduct = (req, res, next) => {
             product: product
         });
     });
-    
+
 };
 
 exports.postEditProduct = (req, res, next) => {
@@ -60,7 +65,7 @@ exports.postDeleteProduct = (req, res, next) => {
     res.redirect('/admin/products');
 };
 
-exports.getProducts =  (req, res, next) => {
+exports.getProducts = (req, res, next) => {
     Product.fetchAll(products => {
         res.render('admin/products', {
             prods: products,

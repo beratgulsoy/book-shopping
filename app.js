@@ -5,6 +5,8 @@ const rootDir = require('./util/path');
 const bp = require('body-parser');
 const errorController = require('./controllers/error');
 const sequelize = require('./util/database');
+const Product = require('./models/product');
+const User = require('./models/user');
 
 const app = express();
 
@@ -16,7 +18,7 @@ app.set('views', 'views');
 const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
 
-app.use(bp.urlencoded({extended: false}));
+app.use(bp.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/admin', adminRoutes);
@@ -24,7 +26,10 @@ app.use(shopRoutes);
 
 app.use(errorController.get404);
 
-sequelize.sync().then(res => {
+Product.belongsTo(User, { constraints: true, onDelete: 'CASCADE' });
+User.hasMany(Product);
+
+sequelize.sync({force: true}).then(res => {
     //console.log(res);
 }).catch(err => console.log(err));
 

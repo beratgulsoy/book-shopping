@@ -5,12 +5,12 @@ let _db;
 
 const mongoConnect = (callback) => {
   MongoClient.connect(
-    "mongodb+srv://berat:TyLHtt3Yxaa2DGWl@cluster0.2nxyobm.mongodb.net/?retryWrites=true&w=majority"
+    "mongodb+srv://berat:TyLHtt3Yxaa2DGWl@cluster0.2nxyobm.mongodb.net/shop?retryWrites=true&w=majority"
   )
     .then((client) => {
       console.log("Connected!");
       _db = client.db();
-      callback(client);
+      callback();
     })
     .catch((err) => {
       console.log(err);
@@ -19,6 +19,7 @@ const mongoConnect = (callback) => {
 };
 
 const getDb = () => {
+    console.log(_db);
   if (_db) {
     return _db;
   }

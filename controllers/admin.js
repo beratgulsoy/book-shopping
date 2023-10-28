@@ -56,15 +56,16 @@ exports.postEditProduct = (req, res, next) => {
   const updatedDescription = req.body.description;
   const updatedPrice = req.body.price;
 
-  const product = new Product(
-    updatedTitle,
-    updatedPrice,
-    updatedDescription,
-    updatedImageUrl,
-    prodId
-  );
-  product
-    .save()
+  Product.findById(prodId)
+    .then((product) => {
+      [product.title, product.price, product.description, product.imageUrl] = [
+        updatedTitle,
+        updatedPrice,
+        updatedDescription,
+        updatedImageUrl,
+      ];
+      return product.save();
+    })
     .then((response) => {
       console.log("Updated!!!!!!!!!");
       res.redirect("/admin/products");
@@ -82,7 +83,7 @@ exports.postDeleteProduct = (req, res, next) => {
 };
 
 exports.getProducts = (req, res, next) => {
-  Product.fetchAll()
+  Product.find()
     .then((products) => {
       res.render("admin/products", {
         prods: products,

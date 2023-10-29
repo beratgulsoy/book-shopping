@@ -123,9 +123,12 @@ exports.postOrder = async (req, res, next) => {
       return order.save();
     })
     .then((result) => {
+      return req.user.clearCart();
+    })
+    .then(() => {
       res.redirect("/orders");
-    });
-  // .catch((err) => console.log(err));
+    })
+    .catch((err) => console.log(err));
 };
 
 exports.getOrders = (req, res, next) => {

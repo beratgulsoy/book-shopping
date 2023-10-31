@@ -7,6 +7,7 @@ const mongoose = require("mongoose");
 const session = require("express-session");
 const MongoDBStore = require("connect-mongodb-session")(session);
 const { csrfSync } = require("csrf-sync");
+const flash = require("connect-flash");
 
 const errorController = require("./controllers/error");
 
@@ -45,6 +46,9 @@ app.use(
   })
 );
 
+app.use(csrfSynchronisedProtection);
+app.use(flash());
+
 app.use((req, res, next) => {
   if (!req.session.user) {
     return next();
@@ -56,7 +60,6 @@ app.use((req, res, next) => {
     })
     .catch((err) => console.log(err));
 });
-app.use(csrfSynchronisedProtection);
 
 app.use((req, res, next) => {
   res.locals.isAuthenticated = req.session.isLoggedIn;

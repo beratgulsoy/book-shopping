@@ -1,6 +1,22 @@
 const bcyrpt = require("bcryptjs");
+// const nodemailer = require("nodemailer");
 
 const User = require("../models/user");
+
+// const transporter = nodemailer.createTransport({
+//   service: "gmail",
+//   auth: {
+//     user: "<mymail>",
+//     pass: "<mypassw>",
+//   },
+// });
+
+let mailOptions = {
+  from: "bookstorebrtglsy@gmail.com",
+  to: "beratgulsoyy@gmail.com",
+  subject: "Sending Email using Node.js",
+  text: "That was easy!",
+};
 
 exports.getLogin = (req, res, next) => {
   let message = req.flash("error");
@@ -17,6 +33,12 @@ exports.getLogin = (req, res, next) => {
 };
 
 exports.getSignup = (req, res, next) => {
+  let message = req.flash("error");
+  if (message.length > 0) {
+    message = message[0];
+  } else {
+    message = null;
+  }
   res.render("auth/signup", {
     pageTitle: "Sign Up!",
     path: "/signup",
@@ -76,9 +98,15 @@ exports.postSignup = (req, res, next) => {
         })
         .then((result) => {
           res.redirect("/login");
-        });
+          // return transporter.sendMail({
+          //   from: "<mymail>",
+          //   to: email,
+          //   subject: "Sending Email using Node.js",
+          //   text: "You succesfully signed up!",
+          // });
+        })
+        .catch((err) => console.log(err));
     })
-
     .catch((err) => console.log(err));
 };
 

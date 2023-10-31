@@ -20,6 +20,7 @@ exports.getSignup = (req, res, next) => {
   res.render("auth/signup", {
     pageTitle: "Sign Up!",
     path: "/signup",
+    errorMessage: message,
   });
 };
 
@@ -60,6 +61,7 @@ exports.postSignup = (req, res, next) => {
   User.findOne({ email: email })
     .then((userDoc) => {
       if (userDoc) {
+        req.flash("error", "E-mail already exists.");
         return res.redirect("/signup");
       }
       return bcyrpt

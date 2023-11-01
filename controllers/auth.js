@@ -3,6 +3,7 @@ const bcyrpt = require("bcryptjs");
 const nodemailer = require("nodemailer");
 
 const User = require("../models/user");
+const user = require("../models/user");
 
 const transporter = nodemailer.createTransport({
   service: "gmail",
@@ -127,6 +128,7 @@ exports.getReset = (req, res, next) => {
     errorMessage: message,
   });
 };
+
 exports.postReset = (req, res, next) => {
   crypto.randomBytes(32, (err, buffer) => {
     if (err) {
@@ -158,4 +160,27 @@ exports.postReset = (req, res, next) => {
       })
       .catch((err) => console.log(err));
   });
+};
+
+exports.getNewPassword = (req, res, next) => {
+  const token = req.params.token;
+  User.findOne({
+    resetToken: token,
+    resetTokenExpiration: { $gt: Date.now() },
+  })
+    .then((user) => {
+      let message = req.flash("error");
+      if (message.length > 0) {
+        message = message[0];
+      } else {
+        message = null;
+      }
+      res.render("auth/new-password", {
+        pageTitle: "Reset Password!",
+        path: "/new-password",
+        errorMessage: message,
+        userId: user._id.toString(),
+      });
+    })
+    .catch((err) => console.log(err));
 };

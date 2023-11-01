@@ -1,22 +1,16 @@
+const crypto = require("crypto");
 const bcyrpt = require("bcryptjs");
-// const nodemailer = require("nodemailer");
+const nodemailer = require("nodemailer");
 
 const User = require("../models/user");
 
-// const transporter = nodemailer.createTransport({
-//   service: "gmail",
-//   auth: {
-//     user: "<mymail>",
-//     pass: "<mypassw>",
-//   },
-// });
-
-let mailOptions = {
-  from: "bookstorebrtglsy@gmail.com",
-  to: "beratgulsoyy@gmail.com",
-  subject: "Sending Email using Node.js",
-  text: "That was easy!",
-};
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: "bookstorebrtglsy@gmail.com",
+    pass: "inub repy iztn maku",
+  },
+});
 
 exports.getLogin = (req, res, next) => {
   let message = req.flash("error");
@@ -98,12 +92,12 @@ exports.postSignup = (req, res, next) => {
         })
         .then((result) => {
           res.redirect("/login");
-          // return transporter.sendMail({
-          //   from: "<mymail>",
-          //   to: email,
-          //   subject: "Sending Email using Node.js",
-          //   text: "You succesfully signed up!",
-          // });
+          return transporter.sendMail({
+            from: "bookstorebrtglsy@gmail.com",
+            to: email,
+            subject: "Sending Email using Node.js",
+            text: "You succesfully signed up!",
+          });
         })
         .catch((err) => console.log(err));
     })
@@ -131,5 +125,37 @@ exports.getReset = (req, res, next) => {
     pageTitle: "Reset Your Password!",
     path: "/reset",
     errorMessage: message,
+  });
+};
+exports.postReset = (req, res, next) => {
+  crypto.randomBytes(32, (err, buffer) => {
+    if (err) {
+      console.log(err);
+      return res.redirect("/reset");
+    }
+    const token = buffer.toString("hex");
+    User.findOne({ email: req.body.email })
+      .then((user) => {
+        if (!user) {
+          req.flash("error", "Email does not exists.");
+          return res.redirect("/reset");
+        }
+        user.resetToken = token;
+        user.resetTokenExpiration = Date.now() + 3600000;
+        return user.save();
+      })
+      .then((result) => {
+        res.redirect("/");
+        transporter.sendMail({
+          from: "bookstorebrtglsy@gmail.com",
+          to: req.body.email,
+          subject: "Password reset",
+          html: `
+              <p>You requested a password reset</p>
+              <p>Click this <a href="http://localhost:3000/reset/${token}">link</a> to set a new password.</p>
+            `,
+        });
+      })
+      .catch((err) => console.log(err));
   });
 };

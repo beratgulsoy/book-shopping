@@ -83,32 +83,24 @@ exports.postSignup = (req, res, next) => {
       errorMessage: errors.array()[0].msg,
     });
   }
-  User.findOne({ email: email })
-    .then((userDoc) => {
-      if (userDoc) {
-        req.flash("error", "E-mail already exists.");
-        return res.redirect("/signup");
-      }
-      return bcyrpt
-        .hash(password, 12)
-        .then((hashedPassword) => {
-          const user = new User({
-            email: email,
-            password: hashedPassword,
-            cart: { items: [] },
-          });
-          return user.save();
-        })
-        .then((result) => {
-          res.redirect("/login");
-          return transporter.sendMail({
-            from: "bookstorebrtglsy@gmail.com",
-            to: email,
-            subject: "Sending Email using Node.js",
-            text: "You succesfully signed up!",
-          });
-        })
-        .catch((err) => console.log(err));
+  bcyrpt
+    .hash(password, 12)
+    .then((hashedPassword) => {
+      const user = new User({
+        email: email,
+        password: hashedPassword,
+        cart: { items: [] },
+      });
+      return user.save();
+    })
+    .then((result) => {
+      res.redirect("/login");
+      return transporter.sendMail({
+        from: "bookstorebrtglsy@gmail.com",
+        to: email,
+        subject: "Sending Email using Node.js",
+        text: "You succesfully signed up!",
+      });
     })
     .catch((err) => console.log(err));
 };

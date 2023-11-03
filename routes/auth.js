@@ -10,7 +10,16 @@ router.get("/login", authController.getLogin);
 router.get("/signup", authController.getSignup);
 router.get("/reset", authController.getReset);
 router.get("/reset/:token", authController.getNewPassword);
-router.post("/login", authController.postLogin);
+router.post(
+  "/login",
+  [
+    body("email").isEmail().withMessage("Please enter a valid email address."),
+    body("password", "Please check your password")
+      .isLength({ min: 3 })
+      .isAlphanumeric(),
+  ],
+  authController.postLogin
+);
 router.post("/logout", authController.postLogout);
 router.post(
   "/signup",

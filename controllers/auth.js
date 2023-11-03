@@ -25,6 +25,8 @@ exports.getLogin = (req, res, next) => {
     pageTitle: "Login",
     path: "/login",
     errorMessage: message,
+    validationErrors: [],
+    oldInput: { email: "", password: "" },
   });
 };
 
@@ -54,13 +56,20 @@ exports.postLogin = (req, res, next) => {
       pageTitle: "Login",
       path: "/login",
       errorMessage: errors.array()[0].msg,
+      validationErrors: errors.array(),
+      oldInput: { email: email, password: password },
     });
   }
   User.findOne({ email: email })
     .then((user) => {
       if (!user) {
-        req.flash("error", "Invalid email or password.");
-        return res.redirect("/login");
+        return res.status(422).render("auth/login", {
+          pageTitle: "Login",
+          path: "/login",
+          errorMessage: "This user does not exists",
+          validationErrors: errors.array(),
+          oldInput: { email: email, password: password },
+        });
       }
       bcyrpt
         .compare(password, user.password)
@@ -73,7 +82,13 @@ exports.postLogin = (req, res, next) => {
               res.redirect("/");
             });
           }
-          res.redirect("/login");
+          return res.status(422).render("auth/login", {
+            pageTitle: "Login",
+            path: "/login",
+            errorMessage: "Wrong password",
+            validationErrors: errors.array(),
+            oldInput: { email: email, password: password },
+          });
         })
         .catch((err) => {
           console.log(err);

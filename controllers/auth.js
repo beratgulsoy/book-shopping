@@ -40,6 +40,7 @@ exports.getSignup = (req, res, next) => {
     path: "/signup",
     errorMessage: message,
     oldInput: { email: "", password: "", confirmPassword: "" },
+    validationErrors: [],
   });
 };
 
@@ -96,6 +97,7 @@ exports.postSignup = (req, res, next) => {
         password: password,
         confirmPassword: req.body.confirmPassword,
       },
+      validationErrors: errors.array(),
     });
   }
   bcyrpt
